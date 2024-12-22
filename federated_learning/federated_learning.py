@@ -38,7 +38,7 @@ class ModelFL(nn.Module):
 
 
 # METHODS
-def average_model_parameters(models: Iterable, average_weight: List[float]) -> dict:
+def average_model_params(models: Iterable, average_weight: List[float]) -> dict:
     models = list(models)
     avg_state_dict = {}
 
@@ -55,10 +55,11 @@ def average_model_parameters(models: Iterable, average_weight: List[float]) -> d
     return avg_state_dict
 
 
-def update_parameters_of_model(model: nn.Module, weights: dict):
+def update_model_params(model: nn.Module, weights: dict):
     model.load_state_dict(weights)
 
 
+# MAIN LOOP
 def main():
     dataset = datasets.MNIST("./data", transform=transforms.ToTensor(), download=True)
     rounds = 5
@@ -113,11 +114,11 @@ def main():
                 print(f"Epoch {epoch} - client {i} - loss: {loss_sum / nb_samples}")
 
         print("Updating parameters of main model...")
-        update_parameters_of_model(
-            model, average_model_parameters(clients, average_weight)
+        update_model_params(
+            model, average_model_params(clients, average_weight)
         )
         for m in clients:
-            update_parameters_of_model(m, model.state_dict())
+            update_model_params(m, model.state_dict())
 
     model.eval()
     correct = 0
